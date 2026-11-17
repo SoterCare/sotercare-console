@@ -1,47 +1,58 @@
 # CLAUDE.md: sotercare-console
 
 ## What this repo is
-The **care-home web console** (Next.js App Router), used by `org_admin`, `facility_manager` and `ward_head` (read-only). It covers:
-- the live floor view;
-- the alert board and timelines;
-- manager escalation banners;
-- the **shifts dashboard** (roster planner, Now, today's availability);
-- staff, devices, metrics, the resident page;
-- **family account management**;
-- agent outputs: review queue, insights, "why" view, handovers, morning brief.
+The **facility console** (Next.js App Router + BFF) for `facility_manager`, `org_admin` (switches between its facilities, one per request) and `ward_head`. Permissions per `b2b-plan/04` §6: **ward heads edit alert bars (not Critical) and resident settings** and can Pause a resident; managers also run shifts, accounts, settings, billing and support access, and may resolve any alert (D-95).
 
-Specs: `b2b-plan/02`, `05`, `06` §13.
+Views:
+- live floor, alert board and timelines, manager escalation banner + sound, "gateway offline" / "staff not ready" banners;
+- resident page: alert bar ("Applied on the gateway hh:mm"), bedtime / wake, pad type, Pause, admission / transfer / **discharge** (refused while an alert is open, O-31); the **"Critical off" list**;
+- shifts (`08` §5): roster planner, Now ("Nobody on shift"), today's availability, upcoming, **roster-gap warnings**;
+- Admin: **staff and family accounts with temporary passwords and login slips**, manager resets, station-PIN clear, layout, **settings + alert-policy sign-off** (safety limits `09` §2.1), **support access** grants, audit, **data requests** (export / correct / erase / consent withdrawal) and **legal hold** (`15` §3–4), Studio mode for unassigned bands;
+- **Billing** (`12` §2): overview, invoices, pay now (PayHere), saved card, bank-transfer report, billing details; overdue / suspended banners, read-only history while suspended;
+- agent views: outputs, review queue, "why" view; staff **ARIA**; metrics (per-caregiver figures managers only).
 
-## Current stage
-Only the starter README is here. Next, in order:
-1. Bring in history from **`sotercare-website` (formerly `web-dev-v2`) at `4837021`**, the last commit before the dashboard was removed in `e88ba1e`. Merge in its `phase-1/alert-reliability` (`19aec37`). Then delete the marketing pages, which stay in `sotercare-website`.
-2. Keep the BFF proxy (`server-proxy.ts`, `proxyHeaders.ts`), `alertEvents.ts` + tests and `WebSocketContext.tsx`. Adapt the alerts / vitals components to the new APIs.
-3. Cognito via the BFF (httpOnly cookies; the token never reaches browser JavaScript; socket via a short-lived ticket).
-4. Live floor + alert board (Phase 1–2); shifts, family and admin (Phase 3); agent views (Phase 4).
+It also owns the **shared design tokens and chart style** used by mobile, ops console and the nurse station (`10` §5; home O-22).
+
+Plan docs (`16` §3): 03 §3, 04, 05 §2–4, 07, 08, 09, 10 §5, 11 §4 + §9, 12, 14 §5–6, 15, and `17` §3.7.
+
+## Current stage / next work
+Only the starter README and this file are here. Track **W** (`18` §5.1):
+1. **Day 0:** cut-over (`17` §3.7): from `sotercare-website` at **`4837021`**, merge its `phase-1/alert-reliability` (`19aec37`), delete the marketing pages. Write `docs/spec.md` + `docs/plan.md`.
+2. **Days 1–2:** skeleton, BFF auth (tenant pool from `name@tenantId`), i18n, chart components + design tokens (tokens by Day 4).
+3. **Days 3–7:** live floor, alert board / timelines, residents + alert bar, shifts. Checkpoints Day 3 (`admin@demo` logs in) and Day 5 (live floor).
+4. **Days 8–12:** admin (staff, family, station PIN, layout, settings, policy sign-off, support access, audit), billing, agent views (review queue, why view), metrics. Checkpoints Days 10 and 12.
+5. **Days 13–14:** polish, Playwright e2e.
 
 ## Connections
 | Direction | Repo | Via | What |
 |---|---|---|---|
-| in/out | `sotercare-backend` | REST `/v1` through the BFF, Socket.IO | everything shown and every admin action |
-| uses | `sotercare-contracts` | npm | API and WebSocket types |
-| shows output of | `sotercare-agents` | via backend | review queue, insights, case traces |
-| deployed by | `sotercare-infra` | Amplify / CloudFront + ECS | — |
-| separate from | `sotercare-website` | — | marketing stays there |
+| in/out | `sotercare-backend` | REST `/v1` through the BFF, Socket.IO | everything shown and every admin, billing and ARIA action |
+| in | PayHere | hosted checkout (started by the backend) | invoice payments, saved card |
+| uses | `sotercare-contracts` | npm (GitHub Packages) | API and WebSocket types; mock server before the backend exists |
+| shows output of | `sotercare-agents` | via backend | outputs, review queue, case traces, ARIA |
+| design tokens for | `sotercare-mobile`, `sotercare-ops-console`, `sotercare-edge-gateway` | shared package (O-22) | colours, chart style |
+| deployed by | `sotercare-infra` | Amplify / CloudFront + WAF | — |
 
 ## Rules
-- Shifts are set and changed **only by managers**. **No attendance reports**; availability is display only (D-17)
-- Show "last update hh:mm" when data is stale. During a facility internet outage the gateway kiosk is the live source
-- Per-caregiver metrics are visible to managers only
-- Environment-based API URLs, unlimited socket reconnect with a snapshot re-fetch, error boundaries
+- BFF with httpOnly cookies; tokens never reach browser JavaScript; the socket uses a short-lived ticket. Session 12 h, idle timeout 30 min; MFA for managers and org admins (D-61).
+- Accounts only by managers / org admins, temporary password, no e-mail invites (D-28). The last active manager can't be deactivated (D-60).
+- Critical off only by a manager with a reason; a ward head can't switch Critical off (`07` §3).
+- Shifts set and changed only by managers. **No attendance reports**; availability is display only (D-17).
+- While suspended, safety and access screens stay editable (D-64); AI views and history are read-only.
+- Show "last update hh:mm" when data is stale; the nurse station is the live source during an internet outage.
+- No hard-coded strings (i18next, ICU); per-caregiver metrics for managers only.
 
 ## How the SoterCare B2B platform fits together
 
-**Plan:** `D:\SoterCare\Github-B2B\b2b-plan\` (v2: docs 01–20, one topic per file; not in a repo yet).
+**Plan:** `D:\SoterCare\Github-B2B\b2b-plan\` (v2: docs 01–20, one topic per file). It lives only on the local disk for now; a private `sotercare-docs` repo is proposed so SerenEdge can link it (O-19).
 - Start with `README.md`, `01-Product-and-Scope.md` and `02-System-Architecture.md`.
 - Which docs this repo needs: `16-Repos-and-Ownership.md` §3.
-- `D-xx` / `O-x` refer to `19-Decisions-and-Open-Items.md`.
+- `D-xx` / `O-x` refer to `19-Decisions-and-Open-Items.md`, the decision log. **When docs disagree, 19 wins.**
 - Old code to start from: `17-Old-Code-Carry-Over.md`.
-- Build order and checkpoints: `18-Build-Plan-2-Weeks.md`.
+- Build order and checkpoints: `18-Build-Plan-2-Weeks.md`:
+  - a Day 0 gate, then daily integration checkpoints;
+  - **Day 14 = release candidate (RC)** of the full software system on simulators, ESP32-C6 dev kits and a Pi 5 gateway (D-77);
+  - then a scheduled **follow-on** (weeks 3–4, Days 15–24 in each repo's `docs/plan.md`) before a separate pilot gate.
 
 ```
 sotercare-pcb-designs ── Rev A board ──► sotercare-firmware (thigh band)
@@ -72,7 +83,7 @@ sotercare-website (sotercare.com), sotercare-links (links.sotercare.com): standa
 - **Build from the old repos' work** (D-20), keeping git history.
 
 **Git and commits:**
-- Trunk-based, protected `main`, PRs with CI (lint, typecheck, tests, contract tests).
+- Protected `main`, PRs with CI (lint, typecheck, tests, contract tests against the pinned contracts version). SerenEdge tasks merge to `dev`; a release PR moves `dev` → `main` (O-23).
 - Conventional commits (`feat:`, `fix:`, `docs:`…).
 - **Never add `Co-Authored-By:` or any AI-attribution trailer to commits.**
 - No secrets in git; AWS Secrets Manager in the cloud.

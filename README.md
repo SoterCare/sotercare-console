@@ -1,50 +1,41 @@
 # sotercare-console
 
-The care home's web dashboard (Next.js App Router), used by `org_admin`, `facility_manager` and `ward_head` (read).
+The care home's **facility console** (Next.js App Router with a BFF), used by `facility_manager`, `org_admin` and `ward_head`. What each role can do is in `../b2b-plan/04-Identity-and-Access.md` §6: ward heads edit alert bars (except Critical) and resident settings; managers and org admins also manage shifts, accounts, settings, billing and support access.
+
+Plan: `../b2b-plan/07-Alerting.md`, `08-Staff-and-Shifts.md`, `09-Facility-Settings.md`, `12-Billing-and-Suspension.md`, `14-Contracts.md` §5–6; full list in `16-Repos-and-Ownership.md` §3.
 
 ## Views
-- **Live floor view**: ward → room → resident tiles. State colours (normal / open alert with elapsed timer / claimed by name / pad moisture / band offline / low battery)
-- **Alert board**: Open / Claimed / Resolved today, with re-push count, phones reached and time to claim
-- **Alert timeline**: raised → each re-push round → seen → claimed by → escalations → resolved (outcome and note)
-- **Manager escalation**: unclaimed ≥ 2 min → banner + sound (the manager's primary channel is the mobile app push); "gateway offline" banner
-- **Manager settings**: per-manager on-call / quiet hours for escalation pushes
-- **Shifts dashboard** (see `../b2b-plan/05-Staff-Shifts-and-Check-in.md`). Shifts are set and changed **only by managers**:
-  - **roster planner** (week/month by ward and staff, recurring patterns, copy last week, conflict and coverage warnings, draft → publish);
-  - shift editor (edit, extend, cancel, reassign for cover/swap, roster change history);
-  - **Now** (per ward: on shift now, current availability, open claims, next shift change);
-  - **Today's availability** (timeline per on-shift staff member: on site / online / offline; display only, kept 48 h);
-  - **Upcoming** (7 days, headcount vs coverage rule, unfilled slots);
-  - **Staff** (wards, upcoming shifts, app readiness);
-  - templates, shift margin and coverage rules;
-  - notification settings.
-- **No attendance reports.**
-- **Agent outputs** (see `../b2b-plan/06-Agentic-Design.md`):
-  - **Review queue** for harsh proposals (draft rosters, cover assignments, monthly report, resident profiles, care-routine changes, band reassignments) and **uncertain** proposals (both views shown) with approve / edit / reject;
-  - insights inbox with evidence charts and feedback;
-  - **"Why" view** per output: the case trace (which specialists were asked, their answers, Critic objections, evidence links);
-  - handovers and daily care logs;
-  - morning brief;
-  - device tasks and dead-zone report.
-- **Staff on shift**: local vs cloud connection, alert readiness, current claim
-- **Metrics**: time to claim / resolve (median, p90) by shift, ward and hour; unclaimed ≥ 2 min; alerts per resident; false-alarm rate; ward-head escalations. Per-caregiver figures are managers only
-- **Resident page**: incident history, moisture episodes, activity, skin-temperature trend, band history
-- **Devices**: gateway status; bands (battery, RSSI, firmware, last seen, assignment)
-- **Administration**: wards and rooms, residents, staff and roles, shifts, **family accounts (invite, link to residents, revoke)**, band ↔ resident assignment, alert policy (timers, sign-off), reports and exports
+- **Live floor:** ward → room → resident tiles (alert state with timer, claimed by, moisture, band offline / low battery / charging, alert-bar icons).
+- **Alert board and timeline:** open / claimed / resolved; raised → re-push rounds → claimed → arrived → escalations → resolved with verdict and outcome.
+- **Banners:** manager escalation (banner + sound), gateway offline, staff not ready, nobody on shift, overdue / suspended billing, account-recovery notice.
+- **Residents:** alert bar with "Applied on the gateway hh:mm", bedtime / wake time, pad type, temperature sensitivity, haptic nudge, temporary "until" changes, **Pause**, admission, transfer, **discharge** (refused while an alert is open); a list of every resident with **Critical off**.
+- **Shifts** (managers): roster planner, shift editor, Now, today's availability (display only), upcoming coverage, **roster-gap** warnings, templates and rules. No attendance reports.
+- **Admin:**
+  - staff and family accounts (`name@tenantId`, **temporary password**, printable **login slip**, password reset, deactivate, link family to residents, clear station PIN);
+  - wards, rooms, beds; devices (gateway, bands, assignments, charging dock, Studio mode for unassigned bands);
+  - **facility settings** and **alert-policy sign-off** within the safety limits;
+  - **support access** grants (1 h – 7 days, read-only, revocable);
+  - audit view and export;
+  - **data requests** (export, correct, erase, consent withdrawal) and **legal hold**.
+- **Billing:** plan, billable beds, invoices + PDFs, pay now and saved card (PayHere), "I paid by bank transfer", credit notes, billing details.
+- **Agent outputs:** handovers, care logs, insights, morning brief, device tasks; **review queue** (approve / edit / reject, uncertain items with both views); **"why" view** (case trace); staff **ARIA**.
+- **Metrics:** time to claim / arrival / resolve, false-alarm rate per bed per week, escalations, step-ins. Per-caregiver figures for managers only.
 
 ## Rules
-- BFF with httpOnly cookies. **The token is never exposed to browser JavaScript.** The socket uses a short-lived ticket issued by the BFF
-- Environment-based API URLs (no hard-coding); unlimited socket reconnect, plus re-fetch of the live snapshot on reconnect; error boundaries
-- Shows "last update hh:mm" when data is stale (for example during the facility's internet outage; the gateway kiosk is the live source then)
+- BFF with httpOnly cookies; **tokens are never exposed to browser JavaScript**; the socket uses a short-lived ticket. Session 12 h, idle timeout 30 min; MFA for managers and org admins.
+- Environment-based API URLs; unlimited socket reconnect with a snapshot re-fetch; error boundaries; "last update hh:mm" when data is stale.
+- Translation-ready (i18next, ICU); no hard-coded strings.
+- Owns the shared design tokens and chart style (`10` §5, O-22).
 
 ## Stack
-Next.js · React · TypeScript · Tailwind · TanStack Query · Socket.IO client · charts library (follow the dataviz guidelines) · Playwright e2e · `@sotercare/contracts`
+Next.js App Router · React · TypeScript · Tailwind · TanStack Query · Socket.IO client · i18next · charts (shared style) · Playwright e2e · `@sotercare/contracts`
 
 ## Origin: built from the `web-dev-v2` dashboard (D-20)
-- **Created from** `SoterCare/sotercare-website` (formerly `web-dev-v2`) at **`4837021`**, the last commit before the dashboard was removed (`e88ba1e`), with `phase-1/alert-reliability` (`19aec37`) merged in. The marketing pages are then deleted (they stay in `sotercare-website`)
-- **Keep:** BFF proxy (`server-proxy.ts`, `proxyHeaders.ts`), `alertEvents.ts` + tests, `WebSocketContext.tsx` (reconnect + snapshot), Next.js / Tailwind setup
+- **Created from** `SoterCare/sotercare-website` (formerly `web-dev-v2`) at **`4837021`**, the last commit before the dashboard was removed (`e88ba1e`), with `phase-1/alert-reliability` (`19aec37`) merged in. The marketing pages are then deleted (they stay in `sotercare-website`).
+- **Keep:** BFF proxy (`server-proxy.ts`, `proxyHeaders.ts`), `alertEvents.ts` + tests, `WebSocketContext.tsx` (reconnect + snapshot), Next.js / Tailwind setup.
 - **Adapt:**
-  - `AlertsPanel`, `useAlerts`, `StatsTimeline`, `TemperatureStatistics`, `VitalsDisplay`, `latestVitals` become the alert board, timelines and resident charts;
-  - `NoPhoneBanner` / `notificationStatus` become the staff-readiness and gateway-offline banners;
-  - the recycle bin becomes admin restore
-- **Replace:** `auth.ts`, `useDeviceId.ts` (one device per user) and `mockData.ts` become Cognito through the BFF with facility / ward / resident navigation
-- Full list: `../b2b-plan/07-Old-Repo-Mapping.md` §3.7
+  - `AlertsPanel`, `useAlerts`, `StatsTimeline`, `TemperatureStatistics`, `VitalsDisplay`, `latestVitals` → alert board, timelines and resident charts;
+  - `NoPhoneBanner` / `notificationStatus` → staff-readiness and gateway-offline banners;
+  - the recycle bin → admin restore.
+- **Replace:** `auth.ts`, `useDeviceId.ts` and `mockData.ts` → Cognito through the BFF with facility / ward / resident navigation.
+- Full list: `../b2b-plan/17-Old-Code-Carry-Over.md` §3.7.
