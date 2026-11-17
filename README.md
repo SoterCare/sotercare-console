@@ -40,7 +40,7 @@ The care home's web dashboard (Next.js App Router), used by `org_admin`, `facili
 Next.js · React · TypeScript · Tailwind · TanStack Query · Socket.IO client · charts library (follow the dataviz guidelines) · Playwright e2e · `@sotercare/contracts`
 
 ## Origin: built from the `web-dev-v2` dashboard (D-20)
-- **Created from** `SoterCare/web-dev-v2` at **`4837021`**, the last commit before the dashboard was removed (`e88ba1e`), with `phase-1/alert-reliability` (`19aec37`) merged in. The marketing pages are then deleted (they stay in `sotercare-website`)
+- **Created from** `SoterCare/sotercare-website` (formerly `web-dev-v2`) at **`4837021`**, the last commit before the dashboard was removed (`e88ba1e`), with `phase-1/alert-reliability` (`19aec37`) merged in. The marketing pages are then deleted (they stay in `sotercare-website`)
 - **Keep:** BFF proxy (`server-proxy.ts`, `proxyHeaders.ts`), `alertEvents.ts` + tests, `WebSocketContext.tsx` (reconnect + snapshot), Next.js / Tailwind setup
 - **Adapt:**
   - `AlertsPanel`, `useAlerts`, `StatsTimeline`, `TemperatureStatistics`, `VitalsDisplay`, `latestVitals` become the alert board, timelines and resident charts;
