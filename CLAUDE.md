@@ -17,7 +17,7 @@ Views:
 
 It also owns the **shared design tokens and chart style** used by mobile, ops console and the nurse station (`10` §5; home O-22).
 
-Plan docs (`16` §3): 03 §3, 04, 05 §2–4, 07, 08, 09, 10 §5, 11 §4 + §9, 12, 14 §5–6, 15, 21, and `17` §3.7.
+Plan docs (`16` §3): 03 §3, 04, 05 §2–4, 07, 08, 09, 10 §5, 11 §4 + §9, 12, 14 §5–6, 15, 21, 22, and `17` §3.7.
 
 ## Current stage / next work
 Only the starter README and this file are here. Track **W** (`18` §5.1):
@@ -49,9 +49,16 @@ Only the starter README and this file are here. Track **W** (`18` §5.1):
 - Medications are records only: no dose suggestions or checks; a medication can't be saved without a linked doctor's recommendation (D-111); medication and medical-records screens keep working while suspended (D-64).
 - Medical records files: uploaded straight to S3 by presigned URL, shown only through short-lived URLs after the scan; never to family.
 
+## Design
+The look and its rules are in `b2b-plan/22-Design-System.md`. Tokens, fonts and logos are in `sotercare-contracts/design/` (`tokens.json`, `assets/`), the proposed O-22 home. This repo builds the **shared chart components** on those tokens (`22` §8.9) for mobile and the ops console.
+- Keep the old dashboard look (`4837021`): `#FAFAFA` page + dot grid, `.depth-card` (`#F8F8F8`, `shadow-m`, radius 16) header and 256 px sidebar, active nav = dark pill, inline brand-blue logo 36–40 px, URW Geometric 400 / 500 / 700 (600 renders as Bold).
+- Replace the dashboard's Tailwind default colours (emerald / amber / red / sky / indigo) with tokens. No raw hex.
+- Live floor and alert board use the priority colours and tile states (`22` §3): critical `#DC2626`, urgent `#C2410C`, normal `#FFAB66` with dark text, low = grey icon, gateway offline = `#B91C1C` banner + sound. **Colour + icon + word**, never colour alone.
+- Brand text and links are ink `#3D7E93`; cyan and logo blue are never text. Light mode only.
+
 ## How the SoterCare B2B platform fits together
 
-**Plan:** `D:\SoterCare\Github-B2B\b2b-plan\` (v2: docs 01–21, one topic per file).
+**Plan:** `D:\SoterCare\Github-B2B\b2b-plan\` (v2: docs 01–22, one topic per file; 22 = design system, tokens in `sotercare-contracts/design/`).
 - Start with `README.md`, `01-Product-and-Scope.md` and `02-System-Architecture.md`.
 - Which docs this repo needs: `16-Repos-and-Ownership.md` §3.
 - `D-xx` / `O-x` refer to `19-Decisions-and-Open-Items.md`, the decision log. **When docs disagree, 19 wins.**
@@ -76,7 +83,7 @@ backend ── REST + Socket.IO ──► sotercare-console (facility), sotercar
 backend ── medication records, dose rounds, marks, MAR (21; not alerts, never via the gateway) ──► console, mobile
 backend ── SNS → APNs / FCM push (alerts; medication round reminders) ──► sotercare-mobile
 backend ── REST /v1/ops ──► sotercare-ops-console (SoterCare staff)
-backend ── outbox → SQS events, S3 Parquet, internal API (medication: counts only) ──► sotercare-agents (agents + ARIA)
+backend ── outbox → SQS events, S3 Parquet, internal API (medication: counts only) ──► sotercare-agents (agents + ARIA; GitHub `sotercare-iit`, D-125)
 sotercare-contracts ── schemas + generated types; SerenEdge hub (b2b-plan) ──► firmware, gateway, backend, agents, consoles, mobile
 sotercare-infra ── provisions AWS + per-tenant resources ──► all cloud parts
 sotercare-studio ── records ──► sotercare-iot-dataset (data + model training) ── gait model ──► gateway

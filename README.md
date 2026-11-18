@@ -31,6 +31,9 @@ Plan: `../b2b-plan/07-Alerting.md`, `08-Staff-and-Shifts.md`, `09-Facility-Setti
 - Translation-ready (i18next, ICU); no hard-coded strings.
 - Owns the shared design tokens and chart style (`10` §5, O-22).
 
+## Design
+Look and rules: `../b2b-plan/22-Design-System.md`. Tokens, fonts and logos: `sotercare-contracts/design/`. The console keeps the old dashboard look (`#FAFAFA` + dot grid, `.depth-card` header and sidebar, URW Geometric, dark active nav pill, inline brand-blue logo) and builds the shared chart components. Alert priorities use the colours in 22 §3, always with an icon and a word.
+
 ## Stack
 Next.js App Router · React · TypeScript · Tailwind · TanStack Query · Socket.IO client · i18next · charts (shared style) · Playwright e2e · `@sotercare/contracts`
 
