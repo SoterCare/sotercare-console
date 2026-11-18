@@ -215,7 +215,7 @@ Spec §11.2 (layout, settings).
 **Files:**
 - Create: `src/app/(console)/admin/{layout,settings/[group]}/page.tsx`, tests.
 
-- [ ] **Step 1:** Write the tests: `each group form validates`, `time zone change leads to policy draft`, `quiet hours warning`, `wifi rollout progress`, `family live view switch default on`.
+- [ ] **Step 1:** Write the tests: `each group form validates`, `time zone change leads to policy draft`, `quiet hours warning`, `wifi rollout progress`, `staff wifi ssids list edits` (C-32), `family live view switch default on`.
 - [ ] **Step 2:** Run `npm test -- settings`. Expected: FAIL.
 - [ ] **Step 3:** Implement.
 - [ ] **Step 4:** Run `npm test -- settings`. Expected: PASS.
