@@ -20,12 +20,12 @@ It also owns the **shared design tokens and chart style** used by mobile, ops co
 Plan docs (`16` §3): 03 §3, 04, 05 §2–4, 07, 08, 09, 10 §5, 11 §4 + §9, 12, 14 §5–6, 15, 21, 22, and `17` §3.7.
 
 ## Current stage / next work
-Only the starter README and this file are here. Track **W** (`18` §5.1):
-1. **Day 0:** cut-over (`17` §3.7): from `sotercare-website` at **`4837021`**, merge its `phase-1/alert-reliability` (`19aec37`), delete the marketing pages. Write `docs/spec.md` + `docs/plan.md`.
-2. **Days 1–2:** skeleton, BFF auth (tenant pool from `name@tenantId`), i18n, chart components + design tokens (tokens by Day 4).
-3. **Days 3–7:** live floor, alert board / timelines, residents + alert bar, shifts. Checkpoints Day 3 (`admin@demo` logs in) and Day 5 (live floor).
-4. **Days 8–12:** admin (staff, family incl. per-account unlink / deactivate, station PIN, layout, settings, policy sign-off, support access, audit), **band pool + assignments (read-only views)** and the discharge family choice, **Medical records tab** (upload, versions), **medications** (records from a doctor's recommendation, log, rounds, overdue list, MAR + PDF), billing, agent views (review queue, why view), metrics. Checkpoints Days 10 and 12.
-5. **Days 13–14:** polish, Playwright e2e.
+**Full spec and plan approved (19 Nov):** [`docs/spec.md`](docs/spec.md) (Part A: platform + operational views; Part B: records, admin, billing, agents, testing) and [`docs/plan.md`](docs/plan.md) (Tasks 0–24, lanes W1 / W2). The console runs as a **container** (BFF + Redis sessions; infra updated) and its socket uses a **single-use ticket** (contracts C-33).
+1. **19 Nov:** Task 0 import from `sotercare-website` at `4837021` + `phase-1/alert-reliability` (`19aec37`) in a temp clone (filter-repo drops junk and 97 co-author lines), then delete the marketing site in one commit.
+2. **20–21 Nov:** skeleton on tokens, BFF login + MFA + sessions (CP2: `admin@demo` logs in), facility switching, shared charts, ticketed socket.
+3. **22–23 Nov (CP3):** live floor, banners + escalation sound, alert board, residents + alert settings; accounts, layout, settings (W2).
+4. **24 Nov (CP5):** policy sign-off, medication records from recommendations, Medical records tab, discharge choices, timeline / trends / band (read-only), Devices, shifts.
+5. **25–26 Nov (CP7):** rounds / overdue / MAR, support access / audit / data, billing, updates / review / why / metrics. **27–28 Nov:** E2E + accessibility + acceptance. **INT:** staff ARIA.
 
 ## Connections
 | Direction | Repo | Via | What |
