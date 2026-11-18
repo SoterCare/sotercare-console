@@ -8,11 +8,11 @@ Plan: `../b2b-plan/07-Alerting.md`, `08-Staff-and-Shifts.md`, `09-Facility-Setti
 - **Live floor:** ward → room → resident tiles (alert state with timer, claimed by, moisture, band offline / low battery / charging, alert-bar icons).
 - **Alert board and timeline:** open / claimed / resolved; raised → re-push rounds → claimed → arrived → escalations → resolved with verdict and outcome.
 - **Banners:** manager escalation (banner + sound), gateway offline, staff not ready, nobody on shift, overdue / suspended billing, account-recovery notice.
-- **Residents:** shown by name + **resident number** (`R-0012`), never band IDs (D-99); band assign / unassign / swap from the pool or by QR (applied on the gateway in seconds); alert bar with "Applied on the gateway hh:mm", bedtime / wake time, pad type, temperature sensitivity, haptic nudge, temporary "until" changes, **Pause**, admission, transfer, **discharge** (refused while an alert is open; choose per linked family account: read-only period or deactivate now, D-101); a list of every resident with **Critical off**.
+- **Residents:** shown by name + **resident number** (`R-0012`), never band IDs (D-99); the resident's band shown **read-only** (pairing is done at the nurse station or in the staff app on the facility Wi-Fi, never in the console, D-132); alert bar with "Applied on the gateway hh:mm", bedtime / wake time, pad type, temperature sensitivity, haptic nudge, temporary "until" changes, **Pause**, admission, transfer, **discharge** (refused while an alert is open; choose per linked family account: read-only period or deactivate now, D-101); a list of every resident with **Critical off**.
 - **Shifts** (managers): roster planner, shift editor, Now, today's availability (display only), upcoming coverage, **roster-gap** warnings, templates and rules. No attendance reports.
 - **Admin:**
   - staff and family accounts (`name@tenantId`, **temporary password**, printable **login slip**, password reset, deactivate, link family to residents, clear station PIN);
-  - wards, rooms, beds; devices (gateway with its `gatewayId`, one-time band provisioning, the **band pool**, identify, assignments, charging dock, Studio mode for unassigned bands): the only place band IDs appear;
+  - wards, rooms, beds; devices (gateway with its `gatewayId`, band provisioning status, the **band pool and assignments (read-only, mirrored from the gateway; no assign button, D-132)**, identify, charging dock, Studio mode for unassigned bands): the only place band IDs appear;
   - family accounts unlinked or deactivated **per person** (D-101);
   - **facility settings** and **alert-policy sign-off** within the safety limits;
   - **support access** grants (1 h – 7 days, read-only, revocable);

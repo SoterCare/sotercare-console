@@ -5,11 +5,11 @@ The **facility console** (Next.js App Router + BFF) for `facility_manager`, `org
 
 Views:
 - live floor, alert board and timelines, manager escalation banner + sound, "gateway offline" / "staff not ready" banners;
-- resident page (name + **`residentNo`** everywhere, never band IDs, D-99): alert bar ("Applied on the gateway hh:mm"), bedtime / wake, pad type, Pause, **band: assign / unassign / swap** from the pool or by QR, admission / transfer / **discharge** (refused while an alert is open, O-31; a **per-family-account choice**: read-only period or deactivate now, D-101); the **"Critical off" list**;
+- resident page (name + **`residentNo`** everywhere, never band IDs, D-99): alert bar ("Applied on the gateway hh:mm"), bedtime / wake, pad type, Pause, **band: shown read-only** (the resident's band as mirrored from the gateway, "Synced hh:mm"; **no assign button**: pairing happens only at the nurse station or in the staff app on the facility Wi-Fi, D-132), admission / transfer / **discharge** (refused while an alert is open, O-31; a **per-family-account choice**: read-only period or deactivate now, D-101); the **"Critical off" list**;
 - **medications** (D-98, D-111, `21`): resident medication records (add / edit / pause / stop, ward heads, managers, org admins), **each typed from an uploaded doctor's recommendation and linked to it** (can't save without one), the per-resident **medication log**, today's rounds per ward, live overdue list, the **medication record view (MAR)** with PDF export, on-time % per ward and week (no per-caregiver ranking);
 - **Medical records tab** on the resident page (D-112, `21` §10): pictures, PDFs, references and text with categories, dates, sources and versions; upload / new version for ward heads, managers and org admins, view for staff; shows which medications a recommendation supports; "Scanning…" until the virus scan is clean;
 - shifts (`08` §5): roster planner, Now ("Nobody on shift"), today's availability, upcoming, **roster-gap warnings**;
-- Devices admin (the only place band IDs appear, D-99): one-time provisioning, the **band pool** (available / assigned), identify, lost, Studio, the gateway with its **`gatewayId`** (D-100);
+- Devices admin (the only place band IDs appear, D-99): provisioning status (provisioning itself is BLE in the staff app), the **band pool and assignments, read-only** (available / assigned, from the gateway's mirrored assignment records, live via WS `band.assignment`; **no assign / unassign / swap action**, D-132), identify (find a band), lost, Studio, the gateway with its **`gatewayId`** (D-100);
 - Admin: **staff and family accounts with temporary passwords and login slips** (family: unlink or deactivate **each account individually**, D-101), manager resets, station-PIN clear, layout, **settings + alert-policy sign-off** (safety limits `09` §2.1), **support access** grants, audit, **data requests** (export / correct / erase / consent withdrawal) and **legal hold** (`15` §3–4), Studio mode for unassigned bands;
 - **Billing** (`12` §2): overview, invoices, pay now (PayHere), saved card, bank-transfer report, billing details; overdue / suspended banners, read-only history while suspended;
 - agent views: outputs, review queue, "why" view; staff **ARIA**; metrics (per-caregiver figures managers only). The family weekly brief has **no hold** (D-51). **No view of family ARIA chats** for any role, managers and org admins included (D-113); the audit shows chat metadata only;
@@ -24,7 +24,7 @@ Only the starter README and this file are here. Track **W** (`18` §5.1):
 1. **Day 0:** cut-over (`17` §3.7): from `sotercare-website` at **`4837021`**, merge its `phase-1/alert-reliability` (`19aec37`), delete the marketing pages. Write `docs/spec.md` + `docs/plan.md`.
 2. **Days 1–2:** skeleton, BFF auth (tenant pool from `name@tenantId`), i18n, chart components + design tokens (tokens by Day 4).
 3. **Days 3–7:** live floor, alert board / timelines, residents + alert bar, shifts. Checkpoints Day 3 (`admin@demo` logs in) and Day 5 (live floor).
-4. **Days 8–12:** admin (staff, family incl. per-account unlink / deactivate, station PIN, layout, settings, policy sign-off, support access, audit), **band pool + assign / swap** and the discharge family choice, **Medical records tab** (upload, versions), **medications** (records from a doctor's recommendation, log, rounds, overdue list, MAR + PDF), billing, agent views (review queue, why view), metrics. Checkpoints Days 10 and 12.
+4. **Days 8–12:** admin (staff, family incl. per-account unlink / deactivate, station PIN, layout, settings, policy sign-off, support access, audit), **band pool + assignments (read-only views)** and the discharge family choice, **Medical records tab** (upload, versions), **medications** (records from a doctor's recommendation, log, rounds, overdue list, MAR + PDF), billing, agent views (review queue, why view), metrics. Checkpoints Days 10 and 12.
 5. **Days 13–14:** polish, Playwright e2e.
 
 ## Connections
@@ -46,6 +46,7 @@ Only the starter README and this file are here. Track **W** (`18` §5.1):
 - Show "last update hh:mm" when data is stale; the nurse station is the live source during an internet outage.
 - No hard-coded strings (i18next, ICU); per-caregiver metrics for managers only (never for medication rounds).
 - Staff views identify residents by name + `residentNo`, never band IDs (D-99); band IDs only in Devices admin.
+- **The console never assigns bands** (D-132): band ↔ resident pairing is done on the gateway (nurse station or staff app over the local connection), which is authoritative. Show the mirror read-only with its sync time; the backend refuses any write with 409 `assign_via_gateway`. Where users look for it, say "Pair bands at the nurse station".
 - Medications are records only: no dose suggestions or checks; a medication can't be saved without a linked doctor's recommendation (D-111); medication and medical-records screens keep working while suspended (D-64).
 - Medical records files: uploaded straight to S3 by presigned URL, shown only through short-lived URLs after the scan; never to family.
 
@@ -65,7 +66,7 @@ The look and its rules are in `b2b-plan/22-Design-System.md`. Tokens, fonts and 
 - Old code to start from: `17-Old-Code-Carry-Over.md`.
 - Build order and checkpoints: `18-Build-Plan-2-Weeks.md` ("Build Plan to 28 Nov"):
   - **Day 0 gate 18–19 Nov** (every repo's spec + plan, SerenEdge projects, cut-over), then dated daily checkpoints CP1–CP8 (20–27 Nov);
-  - **development complete on 28 Nov 2026** (D-115): all 37 acceptance scenarios green on simulators, ESP32-C6 dev kits / Rev A boards and a Pi 5 gateway;
+  - **development complete on 28 Nov 2026** (D-115): the acceptance scenarios for its tier green (18 §0, §9; priorities D-133) on simulators, ESP32-C6 dev kits / Rev A boards and a Pi 5 gateway;
   - if a checkpoint slips, the **cut order** in 18 §10.2 applies (D-116); the safety core is never cut.
 
 **SerenEdge (D-103):** no new repos. **Each repo is one SerenEdge project**, and projects are connected through SerenEdge's **linked knowledge bases**, so any project can ask another's.
@@ -101,7 +102,7 @@ sotercare-website (sotercare.com), sotercare-links (links.sotercare.com): standa
 - **Silo tenancy** (D-31): one tenant per request / case; never hold two tenants' data in one operation.
 - **AWS `ap-south-1`**; **Bedrock** is the only LLM provider (D-07).
 - **Translation-ready UI** (D-26): no hard-coded user-facing strings.
-- **Build from the old repos' work** (D-20), keeping git history.
+- **Build from the old repos' work** (D-20), keeping git history, **except `sotercare-iit`**: competition rule, original work only, no old code (D-125).
 
 **Git and commits:**
 - Protected `main`, PRs with CI (lint, typecheck, tests, contract tests against the pinned contracts version). SerenEdge tasks merge to `dev`; a release PR moves `dev` → `main` (O-23).
