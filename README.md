@@ -16,11 +16,13 @@ Plan: `../b2b-plan/07-Alerting.md`, `08-Staff-and-Shifts.md`, `09-Facility-Setti
   - family accounts unlinked or deactivated **per person** (D-101);
   - **facility settings** and **alert-policy sign-off** within the safety limits;
   - **support access** grants (1 h – 7 days, read-only, revocable);
-  - audit view and export;
+  - audit view and export (family ARIA chats appear as metadata only; no role can read or export them, D-113);
+  - the **Family live view** switch (default on, D-114);
   - **data requests** (export, correct, erase, consent withdrawal) and **legal hold**.
-- **Medications (D-98, `21`):** medication records per resident (versioned, audited), today's rounds per ward, overdue list, the medication record view (MAR) with PDF export, on-time % per ward and week. Records and reminders only, never advice.
+- **Medical records tab (D-112, `21` §10):** per resident, pictures, PDFs, references and text with categories and versions; ward heads, managers and org admins upload, staff view; never shown to family.
+- **Medications (D-98, D-111, `21`):** medication records per resident, each typed from an uploaded **doctor's recommendation** and linked to it (versioned, audited, with the **medication log**), today's rounds per ward, overdue list, the medication record view (MAR) with PDF export, on-time % per ward and week. Records and reminders only, never advice.
 - **Billing:** plan, billable beds, invoices + PDFs, pay now and saved card (PayHere), "I paid by bank transfer", credit notes, billing details.
-- **Agent outputs:** handovers, care logs, insights, morning brief, device tasks; **review queue** (approve / edit / reject, uncertain items with both views); **"why" view** (case trace); staff **ARIA**.
+- **Agent outputs:** handovers, care logs, insights, morning brief, device tasks (the family weekly brief auto-publishes Monday 08:00 with no hold, D-51); **review queue** (approve / edit / reject, uncertain items with both views); **"why" view** (case trace); staff **ARIA**.
 - **Metrics:** time to claim / arrival / resolve, false-alarm rate per bed per week, escalations, step-ins. Per-caregiver figures for managers only.
 
 ## Rules
