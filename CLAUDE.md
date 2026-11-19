@@ -1,5 +1,23 @@
 # CLAUDE.md: sotercare-console
 
+## How work lands here
+Work on this repo now comes from **SerenEdge**: this repo is one SerenEdge project (D-103), and each change starts as a SerenEdge task (or issue) with a key such as `PROJ-42`. The existing history on `main` stays as it is; from here on, every change lands through this branch structure:
+
+- **`main`**: release branch only. It moves forward only when `dev` is merged into it at a release point (release PR `dev` → `main`, O-23).
+- **`dev`**: the integration branch where day-to-day work comes together.
+- **One short-lived branch per task or issue**, cut from `dev` and merged back into `dev` by pull request, then deleted.
+
+Rules for every agent and contributor:
+1. **Work only on a branch off `dev`:**
+   - a task: `task/<KEY>-<short-slug>`, for example `task/PROJ-42-add-due-dates`;
+   - a bug or issue: `issue/<KEY>-<short-slug>`, for example `issue/PROJ-57-login-error`.
+2. **Open a pull request into `dev`.** Never commit or push straight to `main` (or straight to `dev`).
+3. **Commit messages are `<KEY>: short imperative summary`**, for example `PROJ-42: add due dates`.
+4. **No attribution of any kind:** never add a `Co-Authored-By` trailer, a "Generated with" line, or any AI or agent attribution to commits, pull requests, code comments or docs.
+5. **Never commit secrets or a `.env` file.**
+6. **Don't add new frameworks or dependencies without asking first.**
+7. **Keep changes small and tied to one task;** unrelated fixes get their own task or issue and branch.
+
 ## What this repo is
 The **facility console** (Next.js App Router + BFF) for `facility_manager`, `org_admin` (switches between its facilities, one per request) and `ward_head`. Permissions per `b2b-plan/04` §6: **ward heads edit alert bars (not Critical) and resident settings** and can Pause a resident; managers also run shifts, accounts, settings, billing and support access, and may resolve any alert (D-95).
 
@@ -104,8 +122,4 @@ sotercare-website (sotercare.com), sotercare-links (links.sotercare.com): standa
 - **Translation-ready UI** (D-26): no hard-coded user-facing strings.
 - **Build from the old repos' work** (D-20), keeping git history, **except `sotercare-iit`**: competition rule, original work only, no old code (D-125).
 
-**Git and commits:**
-- Protected `main`, PRs with CI (lint, typecheck, tests, contract tests against the pinned contracts version). SerenEdge tasks merge to `dev`; a release PR moves `dev` → `main` (O-23).
-- Conventional commits (`feat:`, `fix:`, `docs:`…).
-- **Never add `Co-Authored-By:` or any AI-attribution trailer to commits.**
-- No secrets in git; AWS Secrets Manager in the cloud.
+**Git and commits:** see [How work lands here](#how-work-lands-here) at the top of this file; those rules apply to every change in this repo. PRs run CI (lint, typecheck, tests, contract tests against the pinned contracts version). Secrets live in AWS Secrets Manager in the cloud, never in git.
