@@ -208,6 +208,15 @@ New test task (part 4 of `docs/plan.md` Task 24).
 - [ ] **Step 3:** `docs/acceptance.md`: the console side of scenarios 3, 5, 6, 9, 10, 13, 16, 23, 24, 25, 30, 31 with the run date, environment and result per scenario.
 - [ ] **Step 4: Commit** `SCCON-<n>: e2e billing and agents, accessibility, acceptance record`.
 
+### lc1: Delete the legacy contracts copy (SCCON-30)
+<a id="lc1-legacy-contracts-cleanup"></a>
+Added 20 Nov (`17` §3.3: after consumers pin the package, delete the old `contracts/v1` copies). The vendored folder itself was not carried over at cut-over, but `tests/contracts.test.mjs` (CT-06 vendored CHECKSUMS test, fails without the folder) and `contracts/v1` comments in `src/lib/alertEvents.ts`, `src/types/dashboard.ts` and `src/components/dashboard/WebSocketContext.tsx` remain. Depends on t0 (SCCON-1) and t1 (SCCON-2, the `@sotercare/contracts@1.1.0` pin). Milestone CP7 (by the 26 Nov feature freeze).
+
+- [ ] **Step 1:** `git grep -nE "contracts/v1|CHECKSUMS" -- src tests`. Expected: matches.
+- [ ] **Step 2:** Delete the vendored test (or its Vitest port) and any skip / exclude added for it; any remaining alert-event shape check validates inline payloads with `@sotercare/contracts/validate` (lenient for received events). No schema or fixture copied into the repo.
+- [ ] **Step 3:** Replace the `contracts/v1` comments with the `@sotercare/contracts` type names (skip files an earlier task already replaced).
+- [ ] **Step 4:** Step 1 grep returns nothing; `serenedge ci` passes. Commit `SCCON-<n>: delete the legacy contracts copy`.
+
 ---
 
 ## Task analysis
@@ -246,6 +255,7 @@ Six checks per task: manual work, security flags, review lane, hours, the test t
 | t26 E2E live ops (SCCON-27) | none | none | auto | 6 | n/a | none |
 | t27 E2E records/admin (SCCON-28) | none | none | auto | 6 | n/a | none |
 | t28 E2E acceptance (SCCON-29) | M5 | payments | human (manual) | 6.5 (6 code + 0.5 manual) | n/a | setup **PayHere sandbox for E2E** |
+| lc1 Legacy contracts cleanup (SCCON-30) | none | none | auto | 1.5 | none (grep + whole suite) | none |
 
 **Totals:** 29 tasks, 159.5 hours; 5 manual steps (2.5 h) on 3 tasks; 24 human-lane, 5 auto-lane (t6, t7, t10, t26, t27); Each test task can verify only one task, so t25 verifies t2, t26 t6, t27 t17 and t28 t21; the other 19 build tasks have no linked test task (their unit and component tests are inside each task, and the grouped E2E runs their flows; Head decision 20 Nov).
 
