@@ -1,0 +1,15 @@
+{
+  "sensitivePaths": [
+    "src/lib/bff/**",
+    "src/app/bff/**",
+    "src/proxy.ts",
+    "src/lib/roles.ts",
+    "src/lib/realtime/**",
+    "src/app/(console)/billing/**",
+    "src/components/billing/**",
+    "src/app/(console)/admin/**",
+    ".github/workflows/**",
+    ".serenedge/**",
+    "Dockerfile"
+  ]
+}

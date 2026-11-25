@@ -1,0 +1,6 @@
+{
+  "command": "node tools/ci/run.mjs",
+  "quickCommand": "node tools/ci/run.mjs --quick",
+  "files": [".serenedge/ci.json", "tools/ci/run.mjs", ".github/workflows/ci.yml"],
+  "timeoutMinutes": 30
+}

@@ -123,3 +123,6 @@ sotercare-website (sotercare.com), sotercare-links (links.sotercare.com): standa
 - **Build from the old repos' work** (D-20), keeping git history, **except `sotercare-iit`**: competition rule, original work only, no old code (D-125).
 
 **Git and commits:** see [How work lands here](#how-work-lands-here) at the top of this file; those rules apply to every change in this repo. PRs run CI (lint, typecheck, tests, contract tests against the pinned contracts version). Secrets live in AWS Secrets Manager in the cloud, never in git.
+
+## CI
+Run `serenedge ci` (`node tools/ci/run.mjs`; `--quick` = lint + typecheck) before every submit and paste its step markers into the PR. The GitHub workflow runs the same steps only on pull requests into `main`. CI files (`.serenedge/ci.json`, `tools/ci/run.mjs`, `.github/workflows/*`) change only in a task marked as a CI change.
