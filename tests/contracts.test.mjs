@@ -4,7 +4,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -17,16 +17,19 @@ import {
 
 const ROOT = fileURLToPath(new URL("../contracts/v1/", import.meta.url));
 const VALID = join(ROOT, "fixtures", "valid");
+// The vendored copy is gone; SCCON-30 deletes this file. Skip until then.
+const present = existsSync(ROOT);
+const skip = present ? false : "contracts/v1 not vendored (removed by SCCON-30)";
 
 // git (core.autocrlf) may check files out with CRLF; checksums are over LF bytes.
 const sha256 = (path) =>
   createHash("sha256").update(readFileSync(path, "utf8").replace(/\r\n/g, "\n"), "utf8").digest("hex");
 
-const checksumLines = readFileSync(join(ROOT, "CHECKSUMS.sha256"), "utf8")
+const checksumLines = (present ? readFileSync(join(ROOT, "CHECKSUMS.sha256"), "utf8") : "")
   .split(/\r?\n/)
   .filter((l) => l.trim() !== "");
 
-test("CHECKSUMS.sha256 is non-empty and lists the alert contracts", () => {
+test("CHECKSUMS.sha256 is non-empty and lists the alert contracts", { skip }, () => {
   const files = checksumLines.map((l) => l.split(/\s+/)[1]);
   for (const f of ["alert_new.schema.json", "alert_updated.schema.json", "fixtures/valid/alert_new.json", "fixtures/valid/alert_updated.json"]) {
     assert.ok(files.includes(f), `${f} listed`);
@@ -63,9 +66,9 @@ const HANDLERS = {
   },
 };
 
-const eventFixtures = readdirSync(VALID).filter((f) => f.startsWith("alert_") && !f.endsWith(".request.json"));
+const eventFixtures = (present ? readdirSync(VALID) : []).filter((f) => f.startsWith("alert_") && !f.endsWith(".request.json"));
 
-test("there is at least one alert event fixture of each handled kind", () => {
+test("there is at least one alert event fixture of each handled kind", { skip }, () => {
   for (const kind of Object.keys(HANDLERS)) {
     assert.ok(eventFixtures.some((f) => f.split(".")[0] === kind), `${kind} fixture present`);
   }
@@ -80,7 +83,7 @@ for (const file of eventFixtures) {
   });
 }
 
-test("every alert_updated status in the schema is handled (remove or ignore)", () => {
+test("every alert_updated status in the schema is handled (remove or ignore)", { skip }, () => {
   const schema = JSON.parse(readFileSync(join(ROOT, "alert_updated.schema.json"), "utf8"));
   for (const status of schema.properties.status.enum) {
     const ev = parseAlertUpdated({ id: "x", deviceId: "d", status, at: 1 });
@@ -90,7 +93,7 @@ test("every alert_updated status in the schema is handled (remove or ignore)", (
   }
 });
 
-test("every alert_new severity in the schema is honoured", () => {
+test("every alert_new severity in the schema is honoured", { skip }, () => {
   const schema = JSON.parse(readFileSync(join(ROOT, "alert_new.schema.json"), "utf8"));
   for (const severity of schema.properties.severity.enum) {
     const a = parseAlertNew({ id: "x", type: "moisture", title: "t", timestamp: 1, deviceId: "d", severity });
